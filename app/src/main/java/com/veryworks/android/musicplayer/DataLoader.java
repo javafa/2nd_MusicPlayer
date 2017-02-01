@@ -45,7 +45,7 @@ public class DataLoader {
         // 4. Content Resolver 로 쿼리한 데이터를 Cursor 에 담는다.
         Cursor cursor = resolver.query(uri, proj, null, null, null);
 
-        // 5. Cursor 에 담긴 데이터를 반복문을 돌면서 꺼낸다.
+        // 5. Cursor 에 담긴 데이터를 반복문을 돌면서 꺼낸다
         if(cursor != null){
             while(cursor.moveToNext()){
                 Music music = new Music();
