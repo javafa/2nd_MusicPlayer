@@ -1,7 +1,7 @@
 # MusicPlayer
 뮤직 플레이어
 
-## 필요권한
+## Permission
 * READ_EXTERNAL_STORAGE : 음악 데이터는 외부저장소를 읽는 런타임 권한이 필요하다.
 * manifest 에도 같이 정의해야만 한다.
 
