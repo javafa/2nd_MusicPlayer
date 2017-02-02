@@ -19,34 +19,29 @@ import java.util.ArrayList;
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
     ArrayList<Music> datas;
     Context context;
+    Intent intent = null;
 
     public MusicAdapter(ArrayList<Music> datas, Context context) {
         this.datas = datas;
         this.context = context;
+        intent = new Intent(context,PlayerActivity.class);
     }
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.card_item,parent,false);
         Holder holder = new Holder(view);
-        holder.cardView.setOnClickListener(clickListener);
         return holder;
     }
 
-    // 플레이어 페이지로 이동
-    View.OnClickListener clickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(context, PlayerActivity.class);
-            context.startActivity(intent);
-        }
-    };
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
         Music music = datas.get(position);
         holder.txtTitle.setText(music.title);
         holder.txtArtist.setText(music.artist);
+        holder.position = position;
+
 
         // holder.image.setImageURI(music.album_image);
         //
@@ -65,6 +60,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
         CardView cardView;
         TextView txtTitle, txtArtist;
         ImageView image;
+        int position;
 
         public Holder(View itemView) {
             super(itemView);
@@ -73,6 +69,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
             txtTitle = (TextView) itemView.findViewById(R.id.txtTitle);
             txtArtist = (TextView) itemView.findViewById(R.id.txtArtist);
             image = (ImageView) itemView.findViewById(R.id.image);
+
+            //
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    intent.putExtra("position", position);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 }

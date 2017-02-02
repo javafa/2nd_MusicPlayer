@@ -50,9 +50,13 @@ public class PlayerAdapter extends PagerAdapter{
         txtTitle.setText(music.title);
         txtArtist.setText(music.artist);
 
+
         Glide.with(context)
                 .load(music.album_image)
+                // 이미지가 없을 경우 대체 이미지
+                .placeholder(android.R.drawable.ic_menu_close_clear_cancel)
                 .into(imageView);
+
 
         // 생성한 뷰를 컨테이너에 담아준다. 컨테이너 = 뷰페이저를 생성한 최외곽 레이아웃 개념
         container.addView(view);

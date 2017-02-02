@@ -1,5 +1,6 @@
 package com.veryworks.android.musicplayer;
 
+import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,17 @@ public class PlayerActivity extends AppCompatActivity {
         PlayerAdapter adapter = new PlayerAdapter(datas ,this);
         // 3. 뷰페이저 아답터 연결
         viewPager.setAdapter( adapter );
+
+        // 4. 특정 페이지 호출
+        Intent intent = getIntent();
+        if(intent != null){
+            Bundle bundle = intent.getExtras();
+            int position = bundle.getInt("position");
+
+            // 실제 페이지 값 계산 처리...
+            // 페이지 이동
+            viewPager.setCurrentItem(position);
+        }
     }
 
     View.OnClickListener clickListener = new View.OnClickListener(){
