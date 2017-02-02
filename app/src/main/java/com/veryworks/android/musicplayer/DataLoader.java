@@ -67,14 +67,21 @@ public class DataLoader {
 
                 music.album_image = getAlbumImageSimple(music.album_id);
 
+                music.uri = getMusicUri(music.id);
+
                 // 주석처리...
                 // music.bitmap_image = getAlbumImageBitmap(music.album_id);
-                //
                 datas.add(music);
             }
             // 6. 처리 후 커서를 닫아준다
             cursor.close();
         }
+    }
+
+    // 음악 id로 uri 를 가져오는 함수
+    private static Uri getMusicUri(String music_id){
+        Uri content_uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        return Uri.withAppendedPath(content_uri, music_id);
     }
 
     // 앨범 Uri 생성
@@ -93,7 +100,6 @@ public class DataLoader {
             InputStream is = resolver.openInputStream(uri);
             // 4. BitmapFactory 를 통해 이미지 데이터를 가져온다
             Bitmap image = BitmapFactory.decodeStream(is);
-
             // 5. 가져온 이미지를 리턴한다
             return image;
         }catch(FileNotFoundException e){
