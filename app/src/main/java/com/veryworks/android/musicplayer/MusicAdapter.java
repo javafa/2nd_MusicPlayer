@@ -1,6 +1,7 @@
 package com.veryworks.android.musicplayer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,12 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 /**
  * Created by pc on 2/1/2017.
  */
-
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
     ArrayList<Music> datas;
     Context context;
@@ -27,14 +28,31 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.card_item,parent,false);
-        return new Holder(view);
+        Holder holder = new Holder(view);
+        holder.cardView.setOnClickListener(clickListener);
+        return holder;
     }
+
+    // 플레이어 페이지로 이동
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(context, PlayerActivity.class);
+            context.startActivity(intent);
+        }
+    };
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
         Music music = datas.get(position);
         holder.txtTitle.setText(music.title);
         holder.txtArtist.setText(music.artist);
+
+        // holder.image.setImageURI(music.album_image);
+        //
+        Glide.with(context)              // 0. 글라이드 사용
+                .load(music.album_image) // 1. 로드할 대상 Uri
+                .into(holder.image);     // 2. 입력될 이미지뷰
     }
 
     @Override
