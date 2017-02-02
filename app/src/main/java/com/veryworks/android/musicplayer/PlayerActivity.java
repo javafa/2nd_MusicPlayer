@@ -1,6 +1,7 @@
 package com.veryworks.android.musicplayer;
 
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.ContactsContract;
@@ -23,15 +24,24 @@ public class PlayerActivity extends AppCompatActivity {
 
     MediaPlayer player;
     SeekBar seekBar;
-    boolean isPlaying = false;
+
+    // 플레이어 상태 플래그
+    private static final int PLAY = 0;
+    private static final int PAUSE = 1;
+    private static final int STOP = 2;
+
+    // 현재 플레이어 상태
+    private static int playStatus = STOP;
 
     int position = 0; // 현재 음악 위치
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
+        // 볼륨 조절 버튼으로 미디어 음량만 조절하기 위한 설정
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
 
@@ -83,12 +93,33 @@ public class PlayerActivity extends AppCompatActivity {
     };
 
     private void play() {
-        Uri musicUri = datas.get(position).uri;
-        player = MediaPlayer.create(this, musicUri);
+        // 플레이중이 아니면 음악 실행
+        switch(playStatus) {
+            case STOP:
+                Uri musicUri = datas.get(position).uri;
+                // 플레이어에 음원 세팅
+                player = MediaPlayer.create(this, musicUri);
+                player.setLooping(false); // 반복여부
+                player.start();
 
-        player.setLooping(false); // 반복여부
-        player.start();
-        isPlaying = true;
+                playStatus = PLAY;
+                btnPlay.setImageResource(android.R.drawable.ic_media_pause);
+                break;
+            // 플레이중이면 멈춤
+            case PLAY :
+                player.pause();
+                playStatus = PAUSE;
+                btnPlay.setImageResource(android.R.drawable.ic_media_play);
+                break;
+            // 멈춤상태이면 거기서 부터 재생
+            case PAUSE:
+                //player.seekTo(player.getCurrentPosition());
+                player.start();
+
+                playStatus = PLAY;
+                btnPlay.setImageResource(android.R.drawable.ic_media_pause);
+                break;
+        }
     }
 
     private void prev() {
