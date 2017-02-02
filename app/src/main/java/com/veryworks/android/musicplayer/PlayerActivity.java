@@ -27,7 +27,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     MediaPlayer player;
     SeekBar seekBar;
-    TextView txtDuration;
+    TextView txtDuration,txtCurrent;
 
     // 플레이어 상태 플래그
     private static final int PLAY = 0;
@@ -46,11 +46,12 @@ public class PlayerActivity extends AppCompatActivity {
     Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            //super.handleMessage(msg);
             switch(msg.what){
                 case PROGRESS_SET:
-                    if(player != null)
+                    if(player != null) {
                         seekBar.setProgress(player.getCurrentPosition());
+                        txtCurrent.setText(player.getCurrentPosition()/1000 + "");
+                    }
                     break;
             }
         }
@@ -68,6 +69,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         txtDuration = (TextView) findViewById(R.id.txtDuration);
+        txtCurrent = (TextView) findViewById(R.id.txtCurrent);
 
         btnRew = (ImageButton) findViewById(R.id.btnRew);
         btnPlay = (ImageButton) findViewById(R.id.btnPlay);
@@ -138,12 +140,8 @@ public class PlayerActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         while (playStatus < STOP) {
-                            Logger.print("position=========" + player.getCurrentPosition(), "PlayerActivity");
                             handler.sendEmptyMessage(PROGRESS_SET);
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                            }
+                            try { Thread.sleep(1000); } catch (InterruptedException e) {}
                         }
                     }
                 }.start();
@@ -180,5 +178,6 @@ public class PlayerActivity extends AppCompatActivity {
         if(player != null){
             player.release(); // 사용이 끝나면 해제해야만 한다.
         }
+        playStatus = STOP;
     }
 }
