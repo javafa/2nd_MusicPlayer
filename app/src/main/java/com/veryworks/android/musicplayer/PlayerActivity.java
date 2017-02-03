@@ -16,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.concurrent.RunnableFuture;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -38,24 +39,6 @@ public class PlayerActivity extends AppCompatActivity {
     private static int playStatus = STOP;
 
     int position = 0; // 현재 음악 위치
-
-    // 핸들러 상태 플래그
-    public static final int PROGRESS_SET = 101;
-
-    // 핸들러
-    Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch(msg.what){
-                case PROGRESS_SET:
-                    if(player != null) {
-                        seekBar.setProgress(player.getCurrentPosition());
-                        txtCurrent.setText(player.getCurrentPosition()/1000 + "");
-                    }
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,15 +119,27 @@ public class PlayerActivity extends AppCompatActivity {
                 btnPlay.setImageResource(android.R.drawable.ic_media_pause);
 
                 // sub thread 를 생성해서 mediaplayer 의 현재 포지션 값으로 seekbar 를 변경해준다. 매 1초마다
-                new Thread() {
+                Thread thread = new Thread() {
                     @Override
                     public void run() {
                         while (playStatus < STOP) {
-                            handler.sendEmptyMessage(PROGRESS_SET);
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(player != null) {
+                                        seekBar.setProgress(player.getCurrentPosition());
+                                        txtCurrent.setText(player.getCurrentPosition()/1000 + "");
+                                    }
+                                }
+                            });
+
                             try { Thread.sleep(1000); } catch (InterruptedException e) {}
                         }
                     }
-                }.start();
+                };
+
+                thread.start();
 
                 break;
             // 플레이중이면 멈춤
@@ -181,3 +176,5 @@ public class PlayerActivity extends AppCompatActivity {
         playStatus = STOP;
     }
 }
+
+
