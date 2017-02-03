@@ -81,6 +81,8 @@ public class PlayerActivity extends AppCompatActivity {
             // 실제 페이지 값 계산 처리...
             // 페이지 이동
             viewPager.setCurrentItem(position);
+            // 음원길이 같은 음악 기본정보를 설정해 준다
+            init();
         }
     }
 
@@ -101,18 +103,23 @@ public class PlayerActivity extends AppCompatActivity {
         }
     };
 
+    private void init(){
+        Uri musicUri = datas.get(position).uri;
+        // 플레이어에 음원 세팅
+        player = MediaPlayer.create(this, musicUri);
+        player.setLooping(false); // 반복여부
+
+        // seekBar 길이
+        seekBar.setMax(player.getDuration());
+        txtDuration.setText(player.getDuration()/1000 + " Sec.");
+        // 현재 실행시간을 0으로 설정
+        txtCurrent.setText("0");
+    }
+
     private void play() {
         // 플레이중이 아니면 음악 실행
         switch(playStatus) {
             case STOP:
-                Uri musicUri = datas.get(position).uri;
-                // 플레이어에 음원 세팅
-                player = MediaPlayer.create(this, musicUri);
-                player.setLooping(false); // 반복여부
-
-                // seekBar 길이
-                seekBar.setMax(player.getDuration());
-                txtDuration.setText(player.getDuration()/1000 + " Sec.");
                 player.start();
 
                 playStatus = PLAY;
