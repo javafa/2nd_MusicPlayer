@@ -81,6 +81,7 @@ public class PlayerActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
+                Logger.print("onPageSelected ======== 들어왔어요~~~","ViewPager Listener");
                 PlayerActivity.this.position = position;
                 init();
             }
@@ -96,12 +97,14 @@ public class PlayerActivity extends AppCompatActivity {
         if(intent != null){
             Bundle bundle = intent.getExtras();
             position = bundle.getInt("position");
-
-            // 실제 페이지 값 계산 처리...
-            // 페이지 이동
-            viewPager.setCurrentItem(position);
-            // 음원길이 같은 음악 기본정보를 설정해 준다
-            init();
+            // 첫페이지일 경우만 init 호출
+            // 이유 : 첫페이지가 아닐경우 위의 setCurrentItem 에 의해서 ViewPager의 onPageSelected가 호출된다.
+            if(position == 0) {
+                init();
+            } else {
+                // 0 페이지가 아닐경우 해당페이지로 이동한다. 이동후 listener 에서 init 이 자동으로 호출된다.
+                viewPager.setCurrentItem(position);
+            }
         }
     }
 
