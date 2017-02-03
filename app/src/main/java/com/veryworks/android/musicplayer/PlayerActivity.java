@@ -149,22 +149,22 @@ public class PlayerActivity extends AppCompatActivity {
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
-                        while (playStatus < STOP) {
-                            if(player != null) {
-                                // 이 부분은 메인쓰레드에서 동작하도록 Runnable 객체를 메인쓰레드에 던져준다
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                    try { // 플레이어가 도중에 종료되면 예외가 발생한다.
+                    while (playStatus < STOP) {
+                        if(player != null) {
+
+                            // 이 부분은 메인쓰레드에서 동작하도록 Runnable 객체를 메인쓰레드에 던져준다
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (player != null) {
                                         seekBar.setProgress(player.getCurrentPosition());
                                         txtCurrent.setText(player.getCurrentPosition() / 1000 + "");
-                                    }catch(Exception e){}
                                     }
-                                });
-                            }
-
-                            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                                }
+                            });
                         }
+                        try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                    }
                     }
                 };
                 // 새로운 쓰레드로 스타트
