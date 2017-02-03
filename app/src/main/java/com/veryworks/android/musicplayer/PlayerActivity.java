@@ -52,6 +52,7 @@ public class PlayerActivity extends AppCompatActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
+        seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
         txtDuration = (TextView) findViewById(R.id.txtDuration);
         txtCurrent = (TextView) findViewById(R.id.txtCurrent);
 
@@ -73,24 +74,7 @@ public class PlayerActivity extends AppCompatActivity {
         // 3. 뷰페이저 아답터 연결
         viewPager.setAdapter( adapter );
         // 4. 뷰페이지 리스너 연결
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Logger.print("onPageSelected ======== 들어왔어요~~~","ViewPager Listener");
-                PlayerActivity.this.position = position;
-                init();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        viewPager.addOnPageChangeListener(viewPagerListener);
 
         // 5. 특정 페이지 호출
         Intent intent = getIntent();
@@ -171,8 +155,10 @@ public class PlayerActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                    try { // 플레이어가 도중에 종료되면 예외가 발생한다.
                                         seekBar.setProgress(player.getCurrentPosition());
-                                        txtCurrent.setText(player.getCurrentPosition()/1000 + "");
+                                        txtCurrent.setText(player.getCurrentPosition() / 1000 + "");
+                                    }catch(Exception e){}
                                     }
                                 });
                             }
@@ -203,11 +189,13 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void prev() {
-
+        if(position > 0)
+            viewPager.setCurrentItem(position - 1);
     }
 
     private void next() {
-
+        if(position < datas.size())
+            viewPager.setCurrentItem(position + 1);
     }
 
     @Override
@@ -218,6 +206,44 @@ public class PlayerActivity extends AppCompatActivity {
         }
         playStatus = STOP;
     }
+
+    // 뷰페이저 체인지 리스너
+    ViewPager.OnPageChangeListener viewPagerListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            Logger.print("onPageSelected ======== 들어왔어요~~~","ViewPager Listener");
+            PlayerActivity.this.position = position;
+            init();
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
+    SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if(player != null && fromUser)
+                player.seekTo(progress);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
 }
 
 
