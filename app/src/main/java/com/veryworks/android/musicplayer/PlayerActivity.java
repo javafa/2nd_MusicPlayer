@@ -115,7 +115,7 @@ public class PlayerActivity extends AppCompatActivity {
         // seekBar 현재값 0으로
         seekBar.setProgress(0);
         // 전체 플레이시간 설정
-        txtDuration.setText(player.getDuration()/1000 + " Sec.");
+        txtDuration.setText(covertMiliToTime(player.getDuration()) + "");
         // 현재 플레이시간을 0으로 설정
         txtCurrent.setText("0");
 
@@ -152,7 +152,7 @@ public class PlayerActivity extends AppCompatActivity {
                                 public void run() {
                                     try {
                                         seekBar.setProgress(player.getCurrentPosition());
-                                        txtCurrent.setText(player.getCurrentPosition() / 1000 + "");
+                                        txtCurrent.setText(covertMiliToTime(player.getCurrentPosition()) + "");
                                     } catch (Exception e) { e.printStackTrace(); }
                                 }
                             });
@@ -180,6 +180,14 @@ public class PlayerActivity extends AppCompatActivity {
                 btnPlay.setImageResource(android.R.drawable.ic_media_pause);
                 break;
         }
+    }
+
+    private String covertMiliToTime(long mili){
+        long min = mili / 1000 / 60;
+        long sec = mili / 1000 % 60;
+
+
+        return String.format("%02d", min) + ":" + String.format("%02d", sec);
     }
 
     private void prev() {
