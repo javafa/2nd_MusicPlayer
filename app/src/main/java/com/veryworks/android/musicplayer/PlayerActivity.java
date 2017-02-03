@@ -52,7 +52,9 @@ public class PlayerActivity extends AppCompatActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
+        // seekBar 의 변경사항을 체크하는 리스너 등록
         seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
+
         txtDuration = (TextView) findViewById(R.id.txtDuration);
         txtCurrent = (TextView) findViewById(R.id.txtCurrent);
 
@@ -62,7 +64,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         btnRew.setOnClickListener(clickListener);
         btnPlay.setOnClickListener(clickListener);
-        btnPlay.setOnClickListener(clickListener);
+        btnFf.setOnClickListener(clickListener);
 
         // 0. 데이터 가져오기
         datas = DataLoader.get(this);
@@ -92,23 +94,6 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-    View.OnClickListener clickListener = new View.OnClickListener(){
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.btnPlay:
-                    play();
-                    break;
-                case R.id.btnRew:
-                    prev();
-                    break;
-                case R.id.btnFf:
-                    next();
-                    break;
-            }
-        }
-    };
-
     // 컨트롤러 정보 초기화
     private void init(){
         // 뷰페이저로 이동할 경우 플레이어에 세팅된 값을 해제한후 로직을 실행한다.
@@ -133,6 +118,16 @@ public class PlayerActivity extends AppCompatActivity {
         txtDuration.setText(player.getDuration()/1000 + " Sec.");
         // 현재 플레이시간을 0으로 설정
         txtCurrent.setText("0");
+
+        // 미디어 플레이어에 완료체크 리스너를 등록한다
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                next();
+            }
+        });
+
+        play();
     }
 
     private void play() {
@@ -151,15 +146,14 @@ public class PlayerActivity extends AppCompatActivity {
                     public void run() {
                     while (playStatus < STOP) {
                         if(player != null) {
-
-                            // 이 부분은 메인쓰레드에서 동작하도록 Runnable 객체를 메인쓰레드에 던져준다
+                            // 이 부분은 메인쓰레드에서 동작하도록 Runnable instance를 메인쓰레드에 던져준다
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (player != null) {
+                                    try {
                                         seekBar.setProgress(player.getCurrentPosition());
                                         txtCurrent.setText(player.getCurrentPosition() / 1000 + "");
-                                    }
+                                    } catch (Exception e) { e.printStackTrace(); }
                                 }
                             });
                         }
@@ -207,6 +201,24 @@ public class PlayerActivity extends AppCompatActivity {
         playStatus = STOP;
     }
 
+    // 버튼 클릭 리스너
+    View.OnClickListener clickListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.btnPlay:
+                    play();
+                    break;
+                case R.id.btnRew:
+                    prev();
+                    break;
+                case R.id.btnFf:
+                    next();
+                    break;
+            }
+        }
+    };
+
     // 뷰페이저 체인지 리스너
     ViewPager.OnPageChangeListener viewPagerListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -227,6 +239,7 @@ public class PlayerActivity extends AppCompatActivity {
         }
     };
 
+    // SeekBar 체인지 리스너
     SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
