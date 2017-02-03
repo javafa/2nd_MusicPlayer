@@ -182,10 +182,10 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    // 시간 포맷 변경 00:00
     private String covertMiliToTime(long mili){
         long min = mili / 1000 / 60;
         long sec = mili / 1000 % 60;
-
 
         return String.format("%02d", min) + ":" + String.format("%02d", sec);
     }
