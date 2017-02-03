@@ -103,6 +103,7 @@ public class PlayerActivity extends AppCompatActivity {
         }
     };
 
+    // 컨트롤러 정보 초기화
     private void init(){
         Uri musicUri = datas.get(position).uri;
         // 플레이어에 음원 세팅
@@ -111,8 +112,9 @@ public class PlayerActivity extends AppCompatActivity {
 
         // seekBar 길이
         seekBar.setMax(player.getDuration());
+        // 전체 플레이시간 설정
         txtDuration.setText(player.getDuration()/1000 + " Sec.");
-        // 현재 실행시간을 0으로 설정
+        // 현재 플레이시간을 0으로 설정
         txtCurrent.setText("0");
     }
 
