@@ -119,26 +119,27 @@ public class PlayerActivity extends AppCompatActivity {
                 btnPlay.setImageResource(android.R.drawable.ic_media_pause);
 
                 // sub thread 를 생성해서 mediaplayer 의 현재 포지션 값으로 seekbar 를 변경해준다. 매 1초마다
+                // sub thread 에서 동작할 로직 정의
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
                         while (playStatus < STOP) {
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(player != null) {
+                            if(player != null) {
+                                // 이 부분은 메인쓰레드에서 동작하도록 Runnable 객체를 메인쓰레드에 던져준다
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
                                         seekBar.setProgress(player.getCurrentPosition());
                                         txtCurrent.setText(player.getCurrentPosition()/1000 + "");
                                     }
-                                }
-                            });
+                                });
+                            }
 
                             try { Thread.sleep(1000); } catch (InterruptedException e) {}
                         }
                     }
                 };
-
+                // 새로운 쓰레드로 스타트
                 thread.start();
 
                 break;
