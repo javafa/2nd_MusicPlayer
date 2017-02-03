@@ -38,7 +38,8 @@ public class PlayerActivity extends AppCompatActivity {
     // 현재 플레이어 상태
     private static int playStatus = STOP;
 
-    int position = 0; // 현재 음악 위치
+    // 현재 음원 index
+    int position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +72,26 @@ public class PlayerActivity extends AppCompatActivity {
         adapter = new PlayerAdapter(datas ,this);
         // 3. 뷰페이저 아답터 연결
         viewPager.setAdapter( adapter );
+        // 4. 뷰페이지 리스너 연결
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-        // 4. 특정 페이지 호출
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                PlayerActivity.this.position = position;
+                init();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        // 5. 특정 페이지 호출
         Intent intent = getIntent();
         if(intent != null){
             Bundle bundle = intent.getExtras();
@@ -105,6 +124,15 @@ public class PlayerActivity extends AppCompatActivity {
 
     // 컨트롤러 정보 초기화
     private void init(){
+        // 뷰페이저로 이동할 경우 플레이어에 세팅된 값을 해제한후 로직을 실행한다.
+        if(player != null){
+            // 플레어 상태를 STOP 으로 변경
+            playStatus = STOP;
+            // 아이콘을 플레이 버튼으로 변경
+            btnPlay.setImageResource(android.R.drawable.ic_media_play);
+            player.release();
+        }
+
         Uri musicUri = datas.get(position).uri;
         // 플레이어에 음원 세팅
         player = MediaPlayer.create(this, musicUri);
@@ -112,6 +140,8 @@ public class PlayerActivity extends AppCompatActivity {
 
         // seekBar 길이
         seekBar.setMax(player.getDuration());
+        // seekBar 현재값 0으로
+        seekBar.setProgress(0);
         // 전체 플레이시간 설정
         txtDuration.setText(player.getDuration()/1000 + " Sec.");
         // 현재 플레이시간을 0으로 설정
