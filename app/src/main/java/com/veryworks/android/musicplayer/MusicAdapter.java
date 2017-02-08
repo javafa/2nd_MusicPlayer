@@ -11,20 +11,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import java.util.ArrayList;
+
+import java.util.List;
 
 /**
  * Created by pc on 2/1/2017.
  */
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
-    ArrayList<Music> datas;
+    List<Music> datas;
     Context context;
     Intent intent = null;
 
-    public MusicAdapter(ArrayList<Music> datas, Context context) {
-        this.datas = datas;
+    public MusicAdapter(Context context) {
+        this.datas = DataLoader.get(context);
         this.context = context;
-        intent = new Intent(context,PlayerActivity.class);
+        this.intent = new Intent(context,PlayerActivity.class);
     }
 
     @Override
@@ -42,9 +43,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
         holder.txtArtist.setText(music.artist);
         holder.position = position;
 
-
-        // holder.image.setImageURI(music.album_image);
-        //
         Glide.with(context)              // 0. 글라이드 사용
                 .load(music.album_image) // 1. 로드할 대상 Uri
                 .into(holder.image);     // 2. 입력될 이미지뷰
@@ -69,15 +67,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
             txtTitle = (TextView) itemView.findViewById(R.id.txtTitle);
             txtArtist = (TextView) itemView.findViewById(R.id.txtArtist);
             image = (ImageView) itemView.findViewById(R.id.image);
-
-            //
-            cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    intent.putExtra("position", position);
-                    context.startActivity(intent);
-                }
-            });
+            cardView.setOnClickListener(listener);
         }
+
+        private View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                intent.putExtra("position", position);
+                context.startActivity(intent);
+            }
+        };
     }
 }

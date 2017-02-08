@@ -4,26 +4,22 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
-import android.provider.ContactsContract;
+import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.concurrent.RunnableFuture;
+import java.util.List;
 
 public class PlayerActivity extends AppCompatActivity {
 
     ViewPager viewPager;
     ImageButton btnRew, btnPlay, btnFf;
 
-    ArrayList<Music> datas;
+    List<Music> datas;
     PlayerAdapter adapter;
 
     MediaPlayer player;
