@@ -100,82 +100,71 @@ public class PlayerActivity extends AppCompatActivity {
             btnPlay.setImageResource(android.R.drawable.ic_media_play);
             player.release();
         }
+        playerInit();
 
+        controllerInit();
+
+        play();
+    }
+
+    private void playerInit(){
         Uri musicUri = datas.get(position).uri;
         // 플레이어에 음원 세팅
         player = MediaPlayer.create(this, musicUri);
         player.setLooping(false); // 반복여부
-
-        // seekBar 길이
-        seekBar.setMax(player.getDuration());
-        // seekBar 현재값 0으로
-        seekBar.setProgress(0);
-        // 전체 플레이시간 설정
-        txtDuration.setText(covertMiliToTime(player.getDuration()) + "");
-        // 현재 플레이시간을 0으로 설정
-        txtCurrent.setText("0");
-
-        // 미디어 플레이어에 완료체크 리스너를 등록한다
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 next();
             }
         });
+    }
 
-        play();
+    private void controllerInit(){
+        seekBar.setMax(player.getDuration()); // seekBar 길이설정
+        seekBar.setProgress(0); // seekBar 현재값 0으로
+        txtDuration.setText(covertMiliToTime(player.getDuration()) + ""); // 전체 플레이시간 설정
+        txtCurrent.setText("0"); // 현재 플레이시간을 0으로 설정
     }
 
     private void play() {
         // 플레이중이 아니면 음악 실행
         switch(playStatus) {
             case STOP:
-                player.start();
-
-                playStatus = PLAY;
-                btnPlay.setImageResource(android.R.drawable.ic_media_pause);
-
-                // sub thread 를 생성해서 mediaplayer 의 현재 포지션 값으로 seekbar 를 변경해준다. 매 1초마다
-                // sub thread 에서 동작할 로직 정의
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                    while (playStatus < STOP) {
-                        if(player != null) {
-                            // 이 부분은 메인쓰레드에서 동작하도록 Runnable instance를 메인쓰레드에 던져준다
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        seekBar.setProgress(player.getCurrentPosition());
-                                        txtCurrent.setText(covertMiliToTime(player.getCurrentPosition()) + "");
-                                    } catch (Exception e) { e.printStackTrace(); }
-                                }
-                            });
-                        }
-                        try { Thread.sleep(1000); } catch (InterruptedException e) {}
-                    }
-                    }
-                };
-                // 새로운 쓰레드로 스타트
-                thread.start();
-
+                playStop();
                 break;
             // 플레이중이면 멈춤
             case PLAY :
-                player.pause();
-                playStatus = PAUSE;
-                btnPlay.setImageResource(android.R.drawable.ic_media_play);
+                playPlay();
                 break;
             // 멈춤상태이면 거기서 부터 재생
             case PAUSE:
-                //player.seekTo(player.getCurrentPosition());
-                player.start();
-
-                playStatus = PLAY;
-                btnPlay.setImageResource(android.R.drawable.ic_media_pause);
+                playPause();
                 break;
         }
+    }
+
+    private void playStop(){
+        player.start();
+
+        playStatus = PLAY;
+        btnPlay.setImageResource(android.R.drawable.ic_media_pause);
+        // 새로운 쓰레드로 스타트
+        Thread thread = new TimerThread();
+        thread.start();
+    }
+
+    private void playPlay(){
+        player.pause();
+        playStatus = PAUSE;
+        btnPlay.setImageResource(android.R.drawable.ic_media_play);
+    }
+
+    private void playPause(){
+        player.start();
+
+        playStatus = PLAY;
+        btnPlay.setImageResource(android.R.drawable.ic_media_pause);
     }
 
     // 시간 포맷 변경 00:00
@@ -261,6 +250,29 @@ public class PlayerActivity extends AppCompatActivity {
 
         }
     };
+
+    // sub thread 를 생성해서 mediaplayer 의 현재 포지션 값으로 seekbar 를 변경해준다. 매 1초마다
+    // sub thread 에서 동작할 로직 정의
+    class TimerThread extends Thread {
+        @Override
+        public void run() {
+            while (playStatus < STOP) {
+                if(player != null) {
+                    // 이 부분은 메인쓰레드에서 동작하도록 Runnable instance를 메인쓰레드에 던져준다
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                seekBar.setProgress(player.getCurrentPosition());
+                                txtCurrent.setText(covertMiliToTime(player.getCurrentPosition()));
+                            } catch (Exception e) { e.printStackTrace(); }
+                        }
+                    });
+                }
+                try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            }
+        }
+    }
 }
 
 
