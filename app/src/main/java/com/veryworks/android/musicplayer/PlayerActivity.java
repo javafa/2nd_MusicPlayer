@@ -73,7 +73,8 @@ public class PlayerActivity extends AppCompatActivity {
         viewPager.setAdapter( adapter );
         // 4. 뷰페이지 리스너 연결
         viewPager.addOnPageChangeListener(viewPagerListener);
-
+        // * 페이지 트랜스포머 연결
+        viewPager.setPageTransformer(false, pageTransformer);
         // 5. 특정 페이지 호출
         Intent intent = getIntent();
         if(intent != null){
@@ -248,6 +249,19 @@ public class PlayerActivity extends AppCompatActivity {
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
 
+        }
+    };
+
+    // 페이지 트랜스포머
+    ViewPager.PageTransformer pageTransformer = new ViewPager.PageTransformer() {
+        @Override
+        public void transformPage(View page, float position) {
+            float normalizedposition = Math.abs( 1 - Math.abs(position) );
+
+            page.setAlpha(normalizedposition);  //View의 투명도 조절
+            page.setScaleX(normalizedposition/2 + 0.5f); //View의 x축 크기조절
+            page.setScaleY(normalizedposition/2 + 0.5f); //View의 y축 크기조절
+            page.setRotationY(position * 80); //View의 Y축(세로축) 회전 각도
         }
     };
 
